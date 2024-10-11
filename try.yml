@@ -19,7 +19,7 @@ stages:
       inputs:
         command: build
         repository: $(dockerHubUser)/$(imageName)
-        dockerfile: Dockerfile
+        dockerfile: Dockerfile/Dockerfile
         tags: |
           latest
           $(Build.BuildId)
