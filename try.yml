@@ -1,0 +1,54 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  dockerHubUser: '<tu_usuario_docker_hub>'
+  dockerHubPassword: $(DOCKER_HUB_PASSWORD) # Esta variable será secreta
+  imageName: 'mi-aplicacion'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: Docker@2
+      displayName: 'Build Docker image'
+      inputs:
+        command: build
+        repository: $(dockerHubUser)/$(imageName)
+        dockerfile: Dockerfile
+        tags: |
+          $(Build.BuildId)
+
+- stage: Deploy
+  jobs:
+  - job: Deploy
+    steps:
+    - task: Docker@2
+      displayName: 'Push Docker image to Docker Hub'
+      inputs:
+        command: push
+        repository: $(dockerHubUser)/$(imageName)
+        tags: |
+          $(Build.BuildId)
+        containerRegistry: 'Docker Hub'
+        dockerRegistryEndpoint: 'DockerHubConnection'
+
+    - script: |
+        echo "Haciendo pull de la última versión de la imagen..."
+        docker pull $(dockerHubUser)/$(imageName):$(Build.BuildId)
+      displayName: 'Pull Docker image from Docker Hub'
+
+    - script: |
+        echo "Deteniendo y eliminando contenedor existente si es necesario..."
+        docker stop mi-contenedor || true
+        docker rm mi-contenedor || true
+      displayName: 'Stop and remove existing container'
+
+    - script: |
+        echo "Ejecutando contenedor con la nueva imagen..."
+        docker run -d --name mi-contenedor -p 8080:80 $(dockerHubUser)/$(imageName):$(Build.BuildId)
+      displayName: 'Run Docker container with updated image'
