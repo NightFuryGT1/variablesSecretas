@@ -5,9 +5,9 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  dockerHubUser: '<tu_usuario_docker_hub>'
-  dockerHubPassword: $(DOCKER_HUB_PASSWORD) # Esta variable será secreta
-  imageName: 'mi-aplicacion'
+  - group: DockerVariables
+  - name: imageName
+    value: 'mi-aplicacion'
 
 stages:
 - stage: Build
@@ -21,6 +21,7 @@ stages:
         repository: $(dockerHubUser)/$(imageName)
         dockerfile: Dockerfile
         tags: |
+          latest
           $(Build.BuildId)
 
 - stage: Deploy
@@ -33,22 +34,31 @@ stages:
         command: push
         repository: $(dockerHubUser)/$(imageName)
         tags: |
+          latest
           $(Build.BuildId)
         containerRegistry: 'Docker Hub'
         dockerRegistryEndpoint: 'DockerHubConnection'
 
     - script: |
         echo "Haciendo pull de la última versión de la imagen..."
-        docker pull $(dockerHubUser)/$(imageName):$(Build.BuildId)
+        docker pull $(dockerHubUser)/$(imageName):latest
       displayName: 'Pull Docker image from Docker Hub'
 
     - script: |
         echo "Deteniendo y eliminando contenedor existente si es necesario..."
-        docker stop mi-contenedor || true
-        docker rm mi-contenedor || true
+        docker stop prueba || true
+        docker rm prueba || true
       displayName: 'Stop and remove existing container'
 
     - script: |
         echo "Ejecutando contenedor con la nueva imagen..."
-        docker run -d --name mi-contenedor -p 8080:80 $(dockerHubUser)/$(imageName):$(Build.BuildId)
+        docker run -d --name prueba -p 8080:80 $(dockerHubUser)/$(imageName):latest
       displayName: 'Run Docker container with updated image'
+
+    - script: |
+        echo "Agregando tag al commit..."
+        git config user.email "armanditosigo@gmail.com"
+        git config user.name "nightfurygt1"
+        git tag -a "v$(Build.BuildId)" -m "Tag de despliegue para la build $(Build.BuildId)"
+        git push origin --tags
+      displayName: 'Tag commit in repository'
