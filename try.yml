@@ -59,12 +59,5 @@ stages:
         docker run -d --name prueba -p 8080:80 $(dockerHubUser)/$(imageName):latest
       displayName: 'Run Docker container with updated image'
 
-    - script: |
-        echo "Agregando tag al commit..."
-        git config user.email "armanditosigo@gmail.com"
-        git config user.name "nightfurygt1"
-        git tag -a "v$(Build.BuildId)" -m "Tag de despliegue para la build $(Build.BuildId)"
-        git remote set-url origin https://$(githubToken)@github.com/nightfurygt1/variablesSecretas.git
-        git push origin --tags
-      displayName: 'Tag commit in repository'
+
 
