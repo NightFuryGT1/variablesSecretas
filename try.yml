@@ -5,7 +5,9 @@ pool:
   name: Default
 
 variables:
-  - group: DockerVariables
+  - group: DockerVariables  # Asegúrate de que este grupo tenga la variable dockerHubUser
+  - name: dockerHubUser
+    value: 'tu-usuario-dockerhub'  # Reemplaza por tu usuario de Docker Hub
   - name: imageName
     value: 'mi-aplicacion'
 
@@ -19,7 +21,7 @@ stages:
       inputs:
         command: build
         repository: $(dockerHubUser)/$(imageName)
-        dockerfile: Dockerfile  # Ruta correcta relativa
+        dockerfile: Dockerfile
         tags: |
           latest
           $(Build.BuildId)
