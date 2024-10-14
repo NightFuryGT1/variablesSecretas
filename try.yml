@@ -19,7 +19,7 @@ stages:
       inputs:
         command: build
         repository: $(dockerHubUser)/$(imageName)
-        dockerfile: Dockerfile/Dockerfile  # Ruta correcta relativa
+        dockerfile: Dockerfile  # Ruta correcta relativa
         tags: |
           latest
           $(Build.BuildId)
