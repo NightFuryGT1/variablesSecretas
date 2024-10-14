@@ -60,7 +60,7 @@ stages:
     - script: |
         echo "Agregando tag al commit..."
         git config user.email "armanditosigo@gmail.com"
-        git config user.name "nightfurygt1"
+        git config user.name "NightFuryGT1"
         git tag -a "v$(Build.BuildId)" -m "Tag de despliegue para la build $(Build.BuildId)"
         git push origin --tags
       displayName: 'Tag commit in repository'
