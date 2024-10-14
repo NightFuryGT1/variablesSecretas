@@ -40,6 +40,8 @@ stages:
         dockerRegistryEndpoint: 'DockerHubConnection'  # Usa una conexión de servicio o variables
 
     - script: |
+        echo "Autenticando en Docker Hub..."
+        echo $(dockerHubPassword) | docker login -u $(dockerHubUser) --password-stdin
         echo "Haciendo pull de la última versión de la imagen..."
         docker pull $(dockerHubUser)/$(imageName):latest
       displayName: 'Pull Docker image from Docker Hub'
