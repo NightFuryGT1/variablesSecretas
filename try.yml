@@ -8,6 +8,8 @@ variables:
   - group: DockerVariables  # Utiliza las variables almacenadas en este grupo
   - name: imageName
     value: 'mi-aplicacion'
+  - name: githubToken
+    value: $(githubToken)  # Variable secreta con el token de GitHub
 
 stages:
 - stage: Build
@@ -37,7 +39,7 @@ stages:
           latest
           $(Build.BuildId)
         containerRegistry: 'Docker Hub'
-        dockerRegistryEndpoint: 'DockerHubConnection'  # Usa una conexión de servicio o variables
+        dockerRegistryEndpoint: 'DockerHubConnection'
 
     - script: |
         echo "Autenticando en Docker Hub..."
@@ -60,7 +62,9 @@ stages:
     - script: |
         echo "Agregando tag al commit..."
         git config user.email "armanditosigo@gmail.com"
-        git config user.name "NightFuryGT1"
+        git config user.name "nightfurygt1"
         git tag -a "v$(Build.BuildId)" -m "Tag de despliegue para la build $(Build.BuildId)"
+        git remote set-url origin https://$(githubToken)@github.com/nightfurygt1/variablesSecretas.git
         git push origin --tags
       displayName: 'Tag commit in repository'
+
