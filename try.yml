@@ -5,9 +5,7 @@ pool:
   name: Default
 
 variables:
-  - group: DockerVariables  # Asegúrate de que este grupo tenga la variable dockerHubUser
-  - name: dockerHubUser
-    value: 'tu-usuario-dockerhub'  # Reemplaza por tu usuario de Docker Hub
+  - group: DockerVariables  # Utiliza las variables almacenadas en este grupo
   - name: imageName
     value: 'mi-aplicacion'
 
@@ -39,7 +37,7 @@ stages:
           latest
           $(Build.BuildId)
         containerRegistry: 'Docker Hub'
-        dockerRegistryEndpoint: 'DockerHubConnection'
+        dockerRegistryEndpoint: 'DockerHubConnection'  # Usa una conexión de servicio o variables
 
     - script: |
         echo "Haciendo pull de la última versión de la imagen..."
